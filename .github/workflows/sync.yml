@@ -1,0 +1,30 @@
+name: Sync with Upstream
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # 每天 00:00 UTC 执行
+  workflow_dispatch: # 允许手动触发
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Add upstream remote
+        run: git remote add upstream https://gitlab.com/Binaryify/neteasecloudmusicapi
+
+      - name: Fetch upstream
+        run: git fetch upstream
+
+      - name: Merge upstream/main
+        run: git merge upstream/main --allow-unrelated-histories -m "Merge upstream changes"
+
+      - name: Push to origin
+        run: git push origin main
+
+      - name: Delete workflow runs
+        uses: Mattraks/delete-workflow-runs@main
+        with:
+          retain_days: 0
+          keep_minimum_runs: 2
